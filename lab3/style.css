@@ -32,7 +32,7 @@ h1 {
 }
 
 .new_game:hover,
-.reset {
+.reset:hover {
   background-color: orange;
 }
 
@@ -43,6 +43,14 @@ h1 {
   display: flex;
   margin: 0 auto;
   flex-direction: column;
+}
+
+.score_display,
+.display_player {
+  text-align: center;
+  font-size: 1.5em;
+  margin: 10px auto;
+  display: block;
 }
 
 .row {
