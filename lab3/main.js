@@ -14,20 +14,16 @@ const winningCombinations = [
 let isPlayerX = true;
 let xMoves = [];
 let oMoves = [];
-
 let XScores = 0;
 let OScores = 0;
-
 let gameover = false;
 
 const squares = document.querySelectorAll("[data-index]");
 const displayPlayer = document.querySelector(".display_player");
-
 const XScoreDisplay = document.querySelector(".x_score");
 const OScoreDisplay = document.querySelector(".o_score");
 
 displayPlayer.textContent = "It's X's turn";
-console.log(squares);
 
 function CheckWinner(Moves) {
   return winningCombinations.some((combo) => {
@@ -35,54 +31,92 @@ function CheckWinner(Moves) {
   });
 }
 
+function computerMove() {
+  let index;
+  do {
+    index = Math.floor(Math.random() * 9);
+  } while (xMoves.includes(index) || oMoves.includes(index));
+
+  oMoves.push(index);
+  squares[index].querySelector(".xo").textContent = "O";
+
+  if (CheckWinner(oMoves)) {
+    displayPlayer.textContent = "O Wins!";
+    OScores++;
+    OScoreDisplay.textContent = OScores;
+    gameover = true;
+    return;
+  }
+
+  if (xMoves.length + oMoves.length === 9) {
+    displayPlayer.textContent = "It's a tie!";
+    gameover = true;
+    return;
+  }
+
+  isPlayerX = true;
+  displayPlayer.textContent = "It's X's turn";
+}
+
 squares.forEach((square) => {
   square.addEventListener("click", function (e) {
-    if (gameover) {
-      return;
-    }
+    if (gameover || !isPlayerX) return;
 
-    console.log(e.currentTarget.dataset.index);
     const index = parseInt(e.currentTarget.dataset.index);
 
     if (xMoves.includes(index) || oMoves.includes(index)) {
-      console.log("Square already taken");
       displayPlayer.textContent = "Square already taken!";
       return;
     }
 
-    const symbol = isPlayerX ? "X" : "O";
-    e.currentTarget.querySelector(".xo").textContent = symbol;
+    e.currentTarget.querySelector(".xo").textContent = "X";
+    xMoves.push(index);
 
-    if (isPlayerX) {
-      xMoves.push(index);
-    } else {
-      oMoves.push(index);
-    }
-
-    const currentMoves = isPlayerX ? xMoves : oMoves;
-
-    if (CheckWinner(currentMoves)) {
-      displayPlayer.textContent = symbol + " Wins!";
-      console.log(symbol + " Wins!");
-
-      if (symbol === "X") {
-        XScores++;
-        XScoreDisplay.textContent = XScores;
-      } else {
-        OScores++;
-        OScoreDisplay.textContent = OScores;
-      }
-
+    if (CheckWinner(xMoves)) {
+      displayPlayer.textContent = "X Wins!";
+      XScores++;
+      XScoreDisplay.textContent = XScores;
       gameover = true;
       return;
     }
 
-    console.log("X Moves: ", xMoves);
-    console.log("O Moves: ", oMoves);
+    if (xMoves.length + oMoves.length === 9) {
+      displayPlayer.textContent = "It's a tie!";
+      gameover = true;
+      return;
+    }
 
-    isPlayerX = !isPlayerX;
-    displayPlayer.textContent = isPlayerX
-      ? "It's X's turn"
-      : "It's O's turn";
+    isPlayerX = false;
+    displayPlayer.textContent = "Computer is thinking...";
+    setTimeout(computerMove, 500);
   });
+});
+
+const newGameBtn = document.querySelector(".new_game");
+const resetBtn = document.querySelector(".reset");
+
+newGameBtn.addEventListener("click", function () {
+  squares.forEach((square) => {
+    square.querySelector(".xo").textContent = "";
+  });
+  xMoves = [];
+  oMoves = [];
+  isPlayerX = true;
+  gameover = false;
+  displayPlayer.textContent = "It's X's turn";
+});
+
+resetBtn.addEventListener("click", function () {
+  squares.forEach((square) => {
+    square.querySelector(".xo").textContent = "";
+  });
+  xMoves = [];
+  oMoves = [];
+  isPlayerX = true;
+  gameover = false;
+  XScores = 0;
+  OScores = 0;
+  XScoreDisplay.textContent = 0;
+  OScoreDisplay.textContent = 0;
+  displayPlayer.textContent = "It's X's turn";
 });
